@@ -1,4 +1,8 @@
-Resume: Today you will see how relational model works and how to get needed data based on basic constructions of  SQL
+# Day 02 - Piscine SQL
+
+## _Deep diving into JOINs in SQL_
+
+Resume: Today you will see how to get needed data based on different structures JOINs
 
 ## Contents
 
@@ -9,27 +13,89 @@ Resume: Today you will see how relational model works and how to get needed data
 3. [Chapter III](#chapter-iii) \
     3.1. [Rules of the day](#rules-of-the-day)  
 4. [Chapter IV](#chapter-iv) \
-    4.1. [Exercise 00 - First steps into SQL world](#exercise-00-first-steps-into-sql-world)  
+    4.1. [Exercise 00 - Move to the LEFT, move to the RIGHT](#exercise-00-move-to-the-left-move-to-the-right)  
 5. [Chapter V](#chapter-v) \
-    5.1. [Exercise 01 - First steps into SQL world](#exercise-01-first-steps-into-sql-world)  
+    5.1. [Exercise 01 - Find data gaps](#exercise-01-find-data-gaps)  
 6. [Chapter VI](#chapter-vi) \
-    6.1. [Exercise 02 - First steps into SQL world](#exercise-02-first-steps-into-sql-world)  
+    6.1. [Exercise 02 - FULL means ‘completely filled’](#exercise-02-full-means-completely-filled)  
 7. [Chapter VII](#chapter-vii) \
-    7.1. [Exercise 03 - First steps into SQL world](#exercise-03-first-steps-into-sql-world)  
+    7.1. [Exercise 03 - Reformat to CTE](#exercise-03-reformat-to-cte)  
 8. [Chapter VIII](#chapter-viii) \
-    8.1. [Exercise 04 - First steps into SQL world](#exercise-04-first-steps-into-sql-world)
+    8.1. [Exercise 04 - Find favourite pizzas](#exercise-04-find-favourite-pizzas)
 9. [Chapter IX](#chapter-ix) \
-    9.1. [Exercise 05 - First steps into SQL world](#exercise-05-first-steps-into-sql-world)
+    9.1. [Exercise 05 - Investigate Person Data](#exercise-05-investigate-person-data)
 10. [Chapter X](#chapter-x) \
-    10.1. [Exercise 06 - First steps into SQL world](#exercise-06-first-steps-into-sql-world)
+    10.1. [Exercise 06 - favourite pizzas for Denis and Anna](#exercise-06-favourite-pizzas-for-denis-and-anna)
 11. [Chapter XI](#chapter-xi) \
-    11.1. [Exercise 07 - First steps into SQL world](#exercise-07-first-steps-into-sql-world)
+    11.1. [Exercise 07 - Cheapest pizzeria for Dmitriy](#exercise-07-cheapest-pizzeria-for-dmitriy)
 12. [Chapter XII](#chapter-xii) \
-    12.1. [Exercise 08 - First steps into SQL world](#exercise-08-first-steps-into-sql-world)
+    12.1. [Exercise 08 - Continuing to research data](#exercise-08-continuing-to-research-data)
 13. [Chapter XIII](#chapter-xiii) \
-    13.1. [Exercise 09 - First steps into SQL world](#exercise-09-first-steps-into-sql-world)
+    13.1. [Exercise 09 - Who loves cheese and pepperoni?](#exercise-09-who-loves-cheese-and-pepperoni)
+14. [Chapter XIV](#chapter-xiv) \
+    14.1. [Exercise 10 - Find persons from one city](#exercise-10-find-persons-from-one-city)
 
 
+## Chapter I
+## Preamble
+
+![D02_01](misc/images/D02_01.png)
+
+In the picture, you can see a Relational Expression in Tree View. This expression corresponds the next SQL query 
+
+    SELECT *
+        FROM R CROSS JOIN S
+    WHERE clause
+
+So, in other words we can describe any SQL in mathematical terms of Relational Algebra.
+
+The main question (which I hear from my students) is why do we need to learn Relational Algebra in a course, if we can write a SQL in a first attempt? My answer is yes and no in one time. “Yes” means you can write a SQL from the first attempt, that’s right , “No” means you have to know the main aspects of Relational Algebra, because this knowledge is in use for optimization plans and for semantic queries. 
+Which type of joins are existing in Relational Algebra?
+Actually, “Cross Join” is a primitive operator and it is an ancestor for other types of joins.
+- Natural Join
+- Theta Join
+- Semi Join
+- Anti Join
+- Left / Right / Full Joins 
+
+But what does a join operation between 2 tables mean? Let me present a part of pseudo code, how join operation works without indexing. 
+
+    FOR r in R LOOP
+        FOR s in S LOOP
+        if r.id = s.r_id then add(r,s)
+        …
+        END;
+    END;
+
+It’s just a set of loops ... Not magic at all
+
+
+
+
+## Chapter II
+## General Rules
+
+- Use this page as the only reference. Do not listen to any rumors and speculations on how to prepare your solution.
+- Please make sure you are using the latest version of PostgreSQL.
+- That is completely OK if you are using IDE to write a source code (aka SQL script).
+- To be assessed your solution must be in your GIT repository.
+- Your solutions will be evaluated by your piscine mates.
+- You should not leave in your directory any other file than those explicitly specified by the exercise instructions. It is recommended that you modify your `.gitignore` to avoid accidents.
+- Do you have a question? Ask your neighbor on the right. Otherwise, try with your neighbor on the left.
+- Your reference manual: mates / Internet / Google. 
+- Read the examples carefully. They may require things that are not otherwise specified in the subject.
+- And may the SQL-Force be with you!
+- Absolutely everything can be presented in SQL! Let’s start and have fun!
+
+## Chapter III
+## Rules of the day
+
+- Please make sure you have an own database and access for it on your PostgreSQL cluster. 
+- Please download a [script](materials/model.sql) with Database Model here and apply the script to your database (you can use command line with psql or just run it through any IDE, for example DataGrip from JetBrains or pgAdmin from PostgreSQL community). 
+- All tasks contain a list of Allowed and Denied sections with listed database options, database types, SQL constructions etc. Please have a look at the section before you start.
+- Please take a look at the Logical View of our Database Model. 
+
+![schema](misc/images/schema.png)
 
 
 1. **pizzeria** table (Dictionary Table with available pizzerias)
@@ -58,174 +124,221 @@ Resume: Today you will see how relational model works and how to get needed data
 - field menu_id - foreign key to menu
 - field order_date - date (for example 2022-01-01) of person order 
 
-Persons' visit and persons' order are different entities and don't contain any correlation between data. For example, a client can be in one restaurant (just looking at menu) and in this time make an order in different one by phone or by mobile application. Or another case,  just be at home and again make a call with order without any visits.
+Persons' visit and persons' order are different entities and don't contain any correlation between data. For example, a client can be in one restraunt (just looking at menu) and in this time make an order in different one by phone or by mobile application. Or another case,  just be at home and again make a call with order without any visits.
 
 ## Chapter IV
-## Exercise 00 - First steps into SQL world
+## Exercise 00 - Move to the LEFT, move to the RIGHT
 
-| Exercise 00: First steps into SQL world |                                                                                                                          |
+| Exercise 00: Move to the LEFT, move to the RIGHT |                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex00                                                                                                                     |
-| Files to turn-in                      | `day00_ex00.sql`                                                                                 |
+| Files to turn-in                      | `day02_ex00.sql`                                                                                 |
 | **Allowed**                               |                                                                                                                          |
 | Language                        | ANSI SQL                                                                                              |
+| **Denied**                               |                                                                                                                          |
+| SQL Syntax Construction                        | `NOT IN`, `IN`, `NOT EXISTS`, `EXISTS`, `UNION`, `EXCEPT`, `INTERSECT`                                                                                              |
 
-Let’s make our first task. 
-Please make a select statement which returns all person's names and person's ages from the city ‘Kazan’.
+Please write a SQL statement which returns a list of pizzerias names with corresponding rating value which have not been visited by persons. 
 
 
 ## Chapter V
-## Exercise 01 - First steps into SQL world
+## Exercise 01 - Find data gaps
 
-| Exercise 01: First steps into SQL world |                                                                                                                          |
+| Exercise 01: Find data gaps|                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex01                                                                                                                     |
-| Files to turn-in                      | `day00_ex01.sql`                                                                                 |
+| Files to turn-in                      | `day02_ex01.sql`                                                                                 |
 | **Allowed**                               |                                                                                                                          |
 | Language                        | ANSI SQL                                                                                              |
+| SQL Syntax Construction                        | `generate_series(...)`                                                                                              |
+| **Denied**                               |                                                                                                                          |
+| SQL Syntax Construction                        | `NOT IN`, `IN`, `NOT EXISTS`, `EXISTS`, `UNION`, `EXCEPT`, `INTERSECT`                                                                                              |
 
-Please make a select statement which returns names , ages for all women from the city ‘Kazan’. Yep, and please sort result by name.
+Please write a SQL statement which returns the missing days from 1st to 10th of January 2022 (including all days) for visits  of persons with identifiers 1 or 2 (it means days missed by both). Please order by visiting days in ascending mode. The sample of data with column name is presented below.
+
+| missing_date |
+| ------ |
+| 2022-01-03 |
+| 2022-01-04 |
+| 2022-01-05 |
+| ... |
+
 
 ## Chapter VI
-## Exercise 02 - First steps into SQL world
+## Exercise 02 - FULL means ‘completely filled’
 
-| Exercise 02: First steps into SQL world |                                                                                                                          |
+| Exercise 02: FULL means ‘completely filled’|                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex02                                                                                                                     |
-| Files to turn-in                      | `day00_ex02.sql`                                                                                 |
+| Files to turn-in                      | `day02_ex02.sql`                                                                                 |
 | **Allowed**                               |                                                                                                                          |
 | Language                        | ANSI SQL                                                                                              |
+| **Denied**                               |                                                                                                                          |
+| SQL Syntax Construction                        | `NOT IN`, `IN`, `NOT EXISTS`, `EXISTS`, `UNION`, `EXCEPT`, `INTERSECT`                                                                                              |
 
-Please make 2 syntax different select statements which return a list of pizzerias (pizzeria name and rating) with rating between 3.5 and 5 points (including limit points) and ordered by pizzeria rating.
-- the 1st select statement must contain comparison signs  (<=, >=)
-- the 2nd select statement must contain `BETWEEN` keyword
+Please write a SQL statement that returns a whole list of person names visited (or not visited) pizzerias during the period from 1st to 3rd of January 2022 from one side and the whole list of pizzeria names which have been visited (or not visited) from the other side. The data sample with needed column names is presented below. Please pay attention to the substitution value ‘-’ for `NULL` values in `person_name` and `pizzeria_name` columns. Please also add ordering for all 3 columns.
+
+| person_name | visit_date | pizzeria_name |
+| ------ | ------ | ------ |
+| - | null | DinoPizza |
+| - | null | DoDo Pizza |
+| Andrey | 2022-01-01 | Dominos |
+| Andrey | 2022-01-02 | Pizza Hut |
+| Anna | 2022-01-01 | Pizza Hut |
+| Denis | null | - |
+| Dmitriy | null | - |
+| ... | ... | ... |
 
 ## Chapter VII
-## Exercise 03 - First steps into SQL world
+## Exercise 03 - Reformat to CTE
 
-| Exercise 03: First steps into SQL world |                                                                                                                          |
+| Exercise 03: Reformat to CTE |                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex03                                                                                                                     |
-| Files to turn-in                      | `day00_ex03.sql`                                                                                 |
+| Files to turn-in                      | `day02_ex03.sql`                                                                                 |
 | **Allowed**                               |                                                                                                                          |
 | Language                        | ANSI SQL                                                                                              |
+| SQL Syntax Construction                        | `generate_series(...)`                                                                                              |
+| **Denied**                               |                                                                                                                          |
+| SQL Syntax Construction                        | `NOT IN`, `IN`, `NOT EXISTS`, `EXISTS`, `UNION`, `EXCEPT`, `INTERSECT`                                                                                              |
 
-Please make a select statement which returns the person's identifiers (without duplication) who visited pizzerias in a period from 6th of January 2022 to 9th of January 2022 (including all days) or visited pizzeria with identifier 2. Also include ordering clause by person identifier in descending mode.
+Let’s return back to Exercise #01, please rewrite your SQL by using the CTE (Common Table Expression) pattern. Please move into the CTE part of your "day generator". The result should be similar like in Exercise #01
+
+| missing_date | 
+| ------ | 
+| 2022-01-03 | 
+| 2022-01-04 | 
+| 2022-01-05 | 
+| ... |
 
 ## Chapter VIII
-## Exercise 04 - First steps into SQL world
+## Exercise 04 - Find favourite pizzas
 
 
-| Exercise 04: First steps into SQL world |                                                                                                                          |
+| Exercise 04: Find favourite pizzas |                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex04                                                                                                                     |
-| Files to turn-in                      | `day00_ex04.sql`                                                                                 |
+| Files to turn-in                      | `day02_ex04.sql`                                                                                 |
 | **Allowed**                               |                                                                                                                          |
 | Language                        | ANSI SQL                                                                                              |
 
-Please make a select statement which returns one calculated field with name ‘person_information’ in one string like described in the next sample:
+Find full information about all possible pizzeria names and prices to get mushroom or pepperoni pizzas. Please sort the result by pizza name and pizzeria name then. The result of sample data is below (please use the same column names in your SQL statement).
 
-`Anna (age:16,gender:'female',address:'Moscow')`
-
-Finally, please add the ordering clause by calculated column in ascending mode.
-Please pay attention to quote symbols in your formula!
+| pizza_name | pizzeria_name | price |
+| ------ | ------ | ------ |
+| mushroom pizza | Dominos | 1100 |
+| mushroom pizza | Papa Johns | 950 |
+| pepperoni pizza | Best Pizza | 800 |
+| ... | ... | ... |
 
 ## Chapter IX
-## Exercise 05 - First steps into SQL world
+## Exercise 05 - Investigate Person Data
 
 
-| Exercise 05: First steps into SQL world |                                                                                                                          |
+| Exercise 05: Investigate Person Data |                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex05                                                                                                                     |
-| Files to turn-in                      | `day00_ex05.sql`                                                                                 |
+| Files to turn-in                      | `day02_ex05.sql`                                                                                 |
 | **Allowed**                               |                                                                                                                          |
 | Language                        | ANSI SQL                                                                                              |
-| **Denied**                               |                                           
-| SQL Syntax Construction                        | `IN`, any types of `JOINs`                                                                                              |
 
-Please make a select statement which returns person's names (based on internal query in `SELECT` clause) who made orders for the menu with identifiers 13 , 14 and 18 and date of orders should be equal 7th of January 2022. Be aware with "Denied Section" before your work.
+Find names of all female persons older than 25 and order the result by name. The sample of output is presented below.
 
-Please take a look at the pattern of internal query.
+| name | 
+| ------ | 
+| Elvira | 
+| ... |
 
-    SELECT 
-	    (SELECT ... ) AS NAME  -- this is an internal query in a main SELECT clause
-    FROM ...
-    WHERE ...
+
 
 ## Chapter X
-## Exercise 06 - First steps into SQL world
+## Exercise 06 - favourite pizzas for Denis and Anna
 
 
-| Exercise 06: First steps into SQL world |                                                                                                                          |
+| Exercise 06: favourite pizzas for Denis and Anna |                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex06                                                                                                                     |
-| Files to turn-in                      | `day00_ex06.sql`                                                                                 |
+| Files to turn-in                      | `day02_ex06.sql`                                                                                 |
 | **Allowed**                               |                                                                                                                          |
 | Language                        | ANSI SQL                                                                                              |
-| **Denied**                               |                                           
-| SQL Syntax Construction                        | `IN`, any types of `JOINs`                                                                                              |
 
-Please use SQL construction from Exercise 05 and add a new calculated column (use column's name ‘check_name’) with a check statement (a pseudo code for this check is presented below) in the `SELECT` clause.
+Please find all pizza names (and corresponding pizzeria names using `menu` table) that Denis or Anna ordered. Sort a result by both columns. The sample of output is presented below.
 
-    if (person_name == 'Denis') then return true
-        else return false
+| pizza_name | pizzeria_name |
+| ------ | ------ |
+| cheese pizza | Best Pizza |
+| cheese pizza | Pizza Hut |
+| ... | ... |
 
 ## Chapter XI
-## Exercise 07 - First steps into SQL world
+## Exercise 07 - Cheapest pizzeria for Dmitriy
 
 
-| Exercise 07: First steps into SQL world |                                                                                                                          |
+| Exercise 07: Cheapest pizzeria for Dmitriy |                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex07                                                                                                                     |
-| Files to turn-in                      | `day00_ex07.sql`                                                                                 |
+| Files to turn-in                      | `day02_ex07.sql`                                                                                 |
 | **Allowed**                               |                                                                                                                          |
 | Language                        | ANSI SQL                                                                                              |
 
-Let’s apply data intervals for the `person` table. 
-Please make a SQL statement which returns a person's identifiers, person's names and interval of person’s ages (set a name of a new calculated column as ‘interval_info’) based on pseudo code below. 
-
-    if (age >= 10 and age <= 20) then return 'interval #1'
-    else if (age > 20 and age < 24) then return 'interval #2'
-    else return 'interval #3'
-
-and yes...please sort a result by ‘interval_info’ column in ascending mode.
+Please find the name of pizzeria Dmitriy visited on January 8, 2022 and could eat pizza for less than 800 rubles.
 
 ## Chapter XII
-## Exercise 08 - First steps into SQL world
+## Exercise 08 - Continuing to research data
 
 
-| Exercise 08: First steps into SQL world |                                                                                                                          |
+| Exercise 08: Continuing to research data |                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex08                                                                                                                     |
-| Files to turn-in                      | `day00_ex08.sql`                                                                                 |
+| Files to turn-in                      | `day02_ex08.sql`                                                                                 |
 | **Allowed**                               |                                                                                                                          |
-| Language                        | ANSI SQL                                                                                              |
+| Language                        | ANSI SQL                                                                                              |           
 
-Please make a SQL statement which returns all columns from the `person_order` table with rows whose identifier is an even number. The result have to order by returned identifier.
+
+Please find the names of all males from Moscow or Samara cities who orders either pepperoni or mushroom pizzas (or both) . Please order the result by person name in descending mode. The sample of output is presented below.
+
+| name | 
+| ------ | 
+| Dmitriy | 
+| ... |
+
 
 ## Chapter XIII
-## Exercise 09 - First steps into SQL world
+## Exercise 09 - Who loves cheese and pepperoni?
 
 
-| Exercise 09: First steps into SQL world |                                                                                                                          |
+| Exercise 09: Who loves cheese and pepperoni? |                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex09                                                                                                                     |
-| Files to turn-in                      | `day00_ex09.sql`                                                                                 |
+| Files to turn-in                      | `day02_ex09.sql`                                                                                 |
 | **Allowed**                               |                                                                                                                          |
 | Language                        | ANSI SQL                                                                                              |
-| **Denied**                               |                                           
-| SQL Syntax Construction                        | any types of `JOINs`                                                                                              |
+
+Please find the names of all females who ordered both pepperoni and cheese pizzas (at any time and in any pizzerias). Make sure that the result is ordered by person name. The sample of data is presented below.
+
+| name | 
+| ------ | 
+| Anna | 
+| ... |
 
 
-Please make a select statement that returns person names and pizzeria names based on the `person_visits` table with date of visit in a period from 07th of January to 09th of January 2022 (including all days) (based on internal query in `FROM` clause) .
+## Chapter XIV
+## Exercise 10 - Find persons from one city
 
 
-Please take a look at the pattern of the final query.
+| Exercise 10: Find persons from one city |                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex10                                                                                                                     |
+| Files to turn-in                      | `day02_ex10.sql`                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        | ANSI SQL                                                                                              |
 
-    SELECT (...) AS person_name ,  -- this is an internal query in a main SELECT clause
-            (...) AS pizzeria_name  -- this is an internal query in a main SELECT clause
-    FROM (SELECT … FROM person_visits WHERE …) AS pv -- this is an internal query in a main FROM clause
-    ORDER BY ...
+Please find the names of persons who live on the same address. Make sure that the result is ordered by 1st person, 2nd person's name and common address. The  data sample is presented below. Please make sure your column names are corresponding column names below.
 
-Please add a ordering clause by person name in ascending mode and by pizzeria name in descending mode
+| person_name1 | person_name2 | common_address | 
+| ------ | ------ | ------ |
+| Andrey | Anna | Moscow |
+| Denis | Kate | Kazan |
+| Elvira | Denis | Kazan |
+| ... | ... | ... |
 
