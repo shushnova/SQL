@@ -1490,3 +1490,886 @@ Sample of my improvement:
     Planning Time: 0.338 ms
     Execution Time: 0.203 ms
 
+
+    # Day 06 - Piscine SQL
+
+## _Let's improve customer experience_
+
+Resume: Today you will see how to add a new business feature into our data model
+
+## Contents
+
+1. [Chapter I](#chapter-i) \
+    1.1. [Preamble](#preamble)
+2. [Chapter II](#chapter-ii) \
+    2.1. [General Rules](#general-rules)
+3. [Chapter III](#chapter-iii) \
+    3.1. [Rules of the day](#rules-of-the-day)  
+4. [Chapter IV](#chapter-iv) \
+    4.1. [Exercise 00 - Discounts, discounts , everyone loves discounts](#exercise-00-discounts-discounts-everyone-loves-discounts)  
+5. [Chapter V](#chapter-v) \
+    5.1. [Exercise 01 - Let’s set personal discounts](#exercise-01-lets-set-personal-discounts)  
+6. [Chapter VI](#chapter-vi) \
+    6.1. [Exercise 02 - Let’s recalculate a history of orders.](#exercise-02-lets-recalculate-a-history-of-orders)  
+7. [Chapter VII](#chapter-vii) \
+    7.1. [Exercise 03 - Improvements are in a way](#exercise-03-improvements-are-in-a-way)  
+8. [Chapter VIII](#chapter-viii) \
+    8.1. [Exercise 04 - We need more Data Consistency](#exercise-04-we-need-more-data-consistency)
+9. [Chapter IX](#chapter-ix) \
+    9.1. [Exercise 05 - Data Governance Rules](#exercise-05-data-governance-rules)
+10. [Chapter X](#chapter-x) \
+    10.1. [Exercise 06 - Let’s automate Primary Key generation](#exercise-06-lets-automate-primary-key-generation)
+
+## Exercise 00 - Discounts, discounts , everyone loves discounts
+
+| Exercise 00: Discounts, discounts , everyone loves discounts |                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex00                                                                                                                     |
+| Files to turn-in                      | `day06_ex00.sql`                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        | SQL, DML, DDL                                                                                              |
+
+Let’s expand our data model to involve a new business feature.
+Every person wants to see a personal discount and every business wants to be closer for clients.
+
+Please think about personal discounts for people from one side and pizzeria restaurants from other. Need to create a new relational table (please set a name `person_discounts`) with the next rules.
+- set id attribute like a Primary Key (please take a look on id column in existing tables and choose the same data type)
+- set for attributes person_id and pizzeria_id foreign keys for corresponding tables (data types should be the same like for id columns in corresponding parent tables)
+- please set explicit names for foreign keys constraints by pattern fk_{table_name}_{column_name},  for example `fk_person_discounts_person_id`
+- add a discount attribute to store a value of discount in percent. Remember, discount value can be a number with floats (please just use `numeric` data type). So, please choose the corresponding data type to cover this possibility.
+
+
+
+## Chapter V
+## Exercise 01 - Let’s set personal discounts
+
+| Exercise 01: Let’s set personal discounts|                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex01                                                                                                                     |
+| Files to turn-in                      | `day06_ex01.sql`                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        | SQL, DML, DDL                                                                                              |
+
+Actually, we created a structure to store our discounts and we are ready to go further and fill our `person_discounts` table with new records.
+
+So, there is a table `person_order` that stores the history of a person's orders. Please write a DML statement (`INSERT INTO ... SELECT ...`) that makes  inserts new records into `person_discounts` table based on the next rules.
+- take aggregated state by person_id and pizzeria_id columns 
+- calculate personal discount value by the next pseudo code:
+
+    `if “amount of orders” = 1 then
+        “discount” = 10.5 
+    else if “amount of orders” = 2 then 
+        “discount” = 22
+    else 
+        “discount” = 30`
+
+- to generate a primary key for the person_discounts table please use  SQL construction below (this construction is from the WINDOW FUNCTION  SQL area).
+    
+    `... ROW_NUMBER( ) OVER ( ) AS id ...`
+
+
+
+
+## Chapter VI
+## Exercise 02 - Let’s recalculate a history of orders
+
+| Exercise 02: Let’s recalculate a history of orders|                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex02                                                                                                                     |
+| Files to turn-in                      | `day06_ex02.sql`                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        | SQL, DML, DDL                                                                                              |
+
+Please write a SQL statement that returns orders with actual price and price with applied discount for each person in the corresponding pizzeria restaurant and sort by person name, and pizza name. Please take a look at the sample of data below.
+
+| name | pizza_name | price | discount_price | pizzeria_name | 
+| ------ | ------ | ------ | ------ | ------ |
+| Andrey | cheese pizza | 800 | 624 | Dominos |
+| Andrey | mushroom pizza | 1100 | 858 | Dominos |
+| ... | ... | ... | ... | ... |
+
+## Chapter VII
+## Exercise 03 - Improvements are in a way
+
+| Exercise 03: Improvements are in a way |                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex03                                                                                                                     |
+| Files to turn-in                      | `day06_ex03.sql`                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        | SQL, DML, DDL                                                                                              |
+
+
+Actually, we have to make improvements to data consistency from one side and performance tuning from the other side. Please create a multicolumn unique index (with name `idx_person_discounts_unique`) that prevents duplicates of pair values person and pizzeria identifiers.
+
+After creation of a new index, please provide any simple SQL statement that shows proof of index usage (by using `EXPLAIN ANALYZE`).
+The example of “proof” is below
+    
+    ...
+    Index Scan using idx_person_discounts_unique on person_discounts
+    ...
+
+
+## Chapter VIII
+## Exercise 04 - We need more Data Consistency
+
+
+| Exercise 04: We need more Data Consistency |                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex04                                                                                                                     |
+| Files to turn-in                      | `day06_ex04.sql`                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        | SQL, DML, DDL                                                                                              |
+
+Please add the following constraint rules for existing columns of the `person_discounts` table.
+- person_id column should not be NULL (use constraint name `ch_nn_person_id`)
+- pizzeria_id column should not be NULL (use constraint name `ch_nn_pizzeria_id`)
+- discount column should not be NULL (use constraint name `ch_nn_discount`)
+- discount column should be 0 percent by default
+- discount column should be in a range values from 0 to 100 (use constraint name `ch_range_discount`)
+
+
+## Chapter IX
+## Exercise 05 - Data Governance Rules
+
+
+| Exercise 05: Data Governance Rules|                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex05                                                                                                                     |
+| Files to turn-in                      | `day06_ex05.sql`                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        |  SQL, DML, DDL                                                                                              |
+
+To satisfy Data Governance Policies need to add comments for the table and table's columns. Let’s apply this policy for the `person_discounts` table. Please add English or Russian comments (it's up to you) that explain what is a business goal of a table and all included attributes. 
+
+## Chapter X
+## Exercise 06 - Let’s automate Primary Key generation
+
+
+| Exercise 06: Let’s automate Primary Key generation|                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex06                                                                                                                     |
+| Files to turn-in                      | `day06_ex06.sql`                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        | SQL, DML, DDL                                                                                              |
+| **Denied**                               |                                                                                                                          |
+| SQL Syntax Pattern                        | Don’t use hard-coded value for amount of rows to set a right value for sequence                                                                                              |
+
+Let’s create a Database Sequence with the name `seq_person_discounts` (starting from 1 value) and set a default value for id attribute of `person_discounts` table to take a value from `seq_person_discounts` each time automatically. 
+Please be aware that your next sequence number is 1, in this case please set an actual value for database sequence based on formula “amount of rows in person_discounts table” + 1. Otherwise you will get errors about Primary Key violation constraint.
+
+# Day 07 - Piscine SQL
+
+## _Aggregated data is more informative, isn't it?_
+
+Resume: Today you will see how to use specific OLAP constructions to get a “Value” from data
+
+## Contents
+
+1. [Chapter I](#chapter-i) \
+    1.1. [Preamble](#preamble)
+2. [Chapter II](#chapter-ii) \
+    2.1. [General Rules](#general-rules)
+3. [Chapter III](#chapter-iii) \
+    3.1. [Rules of the day](#rules-of-the-day)  
+4. [Chapter IV](#chapter-iv) \
+    4.1. [Exercise 00 - Simple aggregated information](#exercise-00-simple-aggregated-information)  
+5. [Chapter V](#chapter-v) \
+    5.1. [Exercise 01 - Let’s see real names](#exercise-01-lets-see-real-names)  
+6. [Chapter VI](#chapter-vi) \
+    6.1. [Exercise 02 - Restaurants statistics](#exercise-02-restaurants-statistics)  
+7. [Chapter VII](#chapter-vii) \
+    7.1. [Exercise 03 - Restaurants statistics #2](#exercise-03-restaurants-statistics-2)  
+8. [Chapter VIII](#chapter-viii) \
+    8.1. [Exercise 04 - Clause for groups](#exercise-04-clause-for-groups)
+9. [Chapter IX](#chapter-ix) \
+    9.1. [Exercise 05 - Person's uniqueness](#exercise-05-persons-uniqueness)
+10. [Chapter X](#chapter-x) \
+    10.1. [Exercise 06 - Restaurant metrics](#exercise-06-restaurant-metrics)
+11. [Chapter XI](#chapter-xi) \
+    11.1. [Exercise 07 - Average global rating](#exercise-07-average-global-rating)
+12. [Chapter XII](#chapter-xii) \
+    12.1. [Exercise 08 - Find pizzeria’s restaurant locations](#exercise-08-find-pizzerias-restaurant-locations)    
+13. [Chapter XIII](#chapter-xiii) \
+    13.1. [Exercise 09 - Explicit type transformation](#exercise-09-explicit-type-transformation)        
+
+## Exercise 00 - Simple aggregated information
+
+| Exercise 00: Simple aggregated information |                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex00                                                                                                                     |
+| Files to turn-in                      | `day07_ex00.sql`                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        | ANSI SQL|
+
+Let’s make a simple aggregation, please write a SQL statement that returns person identifiers and corresponding number of visits in any pizzerias and sorting by count of visits in descending mode and sorting in `person_id` in ascending mode. Please take a look at the sample of data below.
+
+| person_id | count_of_visits |
+| ------ | ------ |
+| 9 | 4 |
+| 4 | 3 |
+| ... | ... | 
+
+
+## Chapter V
+## Exercise 01 - Let’s see real names
+
+| Exercise 01: Let’s see real names|                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex01                                                                                                                     |
+| Files to turn-in                      | `day07_ex01.sql`                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        | ANSI SQL                                                                                              |
+
+Please change a SQL statement from Exercise 00 and return a person name (not identifier). Additional clause is  we need to see only top-4 persons with maximal visits in any pizzerias and sorted by a person name. Please take a look at the example of output data below.
+
+| name | count_of_visits |
+| ------ | ------ |
+| Dmitriy | 4 |
+| Denis | 3 |
+| ... | ... | 
+
+
+
+## Chapter VI
+## Exercise 02 - Restaurants statistics
+
+| Exercise 02: Restaurants statistics|                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex02                                                                                                                     |
+| Files to turn-in                      | `day07_ex02.sql`                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        | ANSI SQL                                                                                              |
+
+Please write a SQL statement to see 3 favorite restaurants by visits and by orders in one list (please add an action_type column with values ‘order’ or ‘visit’, it depends on data from the corresponding table). Please take a look at the sample of data below. The result should be sorted by action_type column in ascending mode and by count column in descending mode.
+
+| name | count | action_type |
+| ------ | ------ | ------ |
+| Dominos | 6 | order |
+| ... | ... | ... |
+| Dominos | 7 | visit |
+| ... | ... | ... |
+
+## Chapter VII
+## Exercise 03 - Restaurants statistics #2
+
+| Exercise 03: Restaurants statistics #2 |                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex03                                                                                                                     |
+| Files to turn-in                      | `day07_ex03.sql`                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        | ANSI SQL                                                                                              |
+
+Please write a SQL statement to see restaurants are grouping by visits and by orders and joined with each other by using restaurant name.  
+You can use internal SQLs from Exercise 02 (restaurants by visits and by orders) without limitations of amount of rows.
+
+Additionally, please add the next rules.
+- calculate a sum of orders and visits for corresponding pizzeria (be aware, not all pizzeria keys are presented in both tables).
+- sort results by `total_count` column in descending mode and by `name` in ascending mode.
+Take a look at the data sample below.
+
+| name | total_count |
+| ------ | ------ |
+| Dominos | 13 |
+| DinoPizza | 9 |
+| ... | ... | 
+
+
+## Chapter VIII
+## Exercise 04 - Clause for groups
+
+
+| Exercise 04: Clause for groups |                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex04                                                                                                                     |
+| Files to turn-in                      | `day07_ex04.sql`                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        | ANSI SQL                                                                                              |
+| **Denied**                               |                                                                                                                          |
+| Syntax construction                        | `WHERE`                                                                                              |
+
+Please write a SQL statement that returns the person name and corresponding number of visits in any pizzerias if the person has visited more than 3 times (> 3).Please take a look at the sample of data below.
+
+| name | count_of_visits |
+| ------ | ------ |
+| Dmitriy | 4 |
+
+
+
+## Chapter IX
+## Exercise 05 - Person's uniqueness
+
+
+| Exercise 05: Person's uniqueness|                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex05                                                                                                                     |
+| Files to turn-in                      | `day07_ex05.sql`                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        |  ANSI SQL                                                                                              |
+| **Denied**                               |                                                                                                                          |
+| Syntax construction                        |  `GROUP BY`, any type (`UNION`,...) working with sets                                                                                              |
+
+Please write a simple SQL query that returns a list of unique person names who made orders in any pizzerias. The result should be sorted by person name. Please take a look at the sample below.
+
+| name | 
+| ------ |
+| Andrey |
+| Anna | 
+| ... | 
+
+## Chapter X
+## Exercise 06 - Restaurant metrics
+
+
+| Exercise 06: Restaurant metrics|                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex06                                                                                                                     |
+| Files to turn-in                      | `day07_ex06.sql`                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        | ANSI SQL                                                                                              |
+
+Please write a SQL statement that returns the amount of orders, average of price, maximum and minimum prices for sold pizza by corresponding pizzeria restaurant. The result should be sorted by pizzeria name. Please take a look at the data sample below. 
+Round your average price to 2 floating numbers.
+
+| name | count_of_orders | average_price | max_price | min_price |
+| ------ | ------ | ------ | ------ | ------ |
+| Best Pizza | 5 | 780 | 850 | 700 |
+| DinoPizza | 5 | 880 | 1000 | 800 |
+| ... | ... | ... | ... | ... |
+
+
+## Chapter XI
+## Exercise 07 - Average global rating
+
+
+| Exercise 07: Average global rating|                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex07                                                                                                                     |
+| Files to turn-in                      | `day07_ex07.sql`                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        | ANSI SQL                                                                                              |
+
+Please write a SQL statement that returns a common average rating (the output attribute name is global_rating) for all restaurants. Round your average rating to 4 floating numbers.
+
+
+## Chapter XII
+## Exercise 08 - Find pizzeria’s restaurant locations
+
+
+| Exercise 08: Find pizzeria’s restaurant locations|                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex08                                                                                                                     |
+| Files to turn-in                      | `day07_ex08.sql`                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        | ANSI SQL                                                                                              |
+
+We know about personal addresses from our data. Let’s imagine, that particular person visits pizzerias in his/her city only. Please write a SQL statement that returns address, pizzeria name and amount of persons’ orders. The result should be sorted by address and then by restaurant name. Please take a look at the sample of output data below.
+
+| address | name |count_of_orders |
+| ------ | ------ |------ |
+| Kazan | Best Pizza |4 |
+| Kazan | DinoPizza |4 |
+| ... | ... | ... | 
+
+
+## Chapter XIII
+## Exercise 09 - Explicit type transformation
+
+
+| Exercise 09: Explicit type transformation|                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex09                                                                                                                     |
+| Files to turn-in                      | `day07_ex09.sql`                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        | ANSI SQL                                                                                              |
+
+Please write a SQL statement that returns aggregated information by person’s address , the result of “Maximal Age - (Minimal Age  / Maximal Age)” that is presented as a formula column, next one is average age per address and the result of comparison between formula and average columns (other words, if formula is greater than  average then True, otherwise False value).
+
+The result should be sorted by address column. Please take a look at the sample of output data below.
+
+| address | formula |average | comparison |
+| ------ | ------ |------ |------ |
+| Kazan | 44.71 |30.33 | true |
+| Moscow | 20.24 | 18.5 | true |
+| ... | ... | ... | ... |
+    
+
+# Day 08 - Piscine SQL
+
+## _Isolation is one of ACID properties_
+
+Resume: Today you will see how database works with transactions and isolation levels
+
+## Contents
+
+1. [Chapter I](#chapter-i) \
+    1.1. [Preamble](#preamble)
+2. [Chapter II](#chapter-ii) \
+    2.1. [General Rules](#general-rules)
+3. [Chapter III](#chapter-iii) \
+    3.1. [Rules of the day](#rules-of-the-day)  
+4. [Chapter IV](#chapter-iv) \
+    4.1. [Exercise 00 - Simple transaction](#exercise-00-simple-transaction)  
+5. [Chapter V](#chapter-v) \
+    5.1. [Exercise 01 - Lost Update Anomaly](#exercise-01-lost-update-anomaly)  
+6. [Chapter VI](#chapter-vi) \
+    6.1. [Exercise 02 - Lost Update for Repeatable Read](#exercise-02-lost-update-for-repeatable-read)  
+7. [Chapter VII](#chapter-vii) \
+    7.1. [Exercise 03 - Non-Repeatable Reads Anomaly](#exercise-03-non-repeatable-reads-anomaly)  
+8. [Chapter VIII](#chapter-viii) \
+    8.1. [Exercise 04 - Non-Repeatable Reads for Serialization](#exercise-04-non-repeatable-reads-for-serialization)
+9. [Chapter IX](#chapter-ix) \
+    9.1. [Exercise 05 - Phantom Reads Anomaly](#exercise-05-phantom-reads-anomaly)
+10. [Chapter X](#chapter-x) \
+    10.1. [Exercise 06 - Phantom Reads for Repeatable Read](#exercise-06-phantom-reads-for-repeatable-read)
+11. [Chapter XI](#chapter-xi) \
+    11.1. [Exercise 07 - Deadlock](#exercise-07-deadlock)
+
+
+      ## Exercise 00 - Simple transaction
+
+| Exercise 00: Simple transaction |                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex00                                                                                                                     |
+| Files to turn-in                      | `day08_ex00.sql` with comments for Session #1, Session #2 statements; screenshot of psql output for Session #1; screenshot of psql output for Session #2 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        |  SQL|
+
+Please for this task use the command line for PostgreSQL database (psql). You need to check how your changes will be published in the database for other database users. 
+
+Actually, we need two active sessions (meaning 2 parallel sessions in the command lines). 
+
+Please provide a proof that your parallel session can’t see your changes until you will make a `COMMIT`;
+
+Take a look at the steps below.
+
+**Session #1**
+- update of rating for “Pizza Hut” to 5 points in a transaction mode .
+- check that you can see a changes in session #1
+
+**Session #2**
+- check that you can’t see a changes in session #2
+
+**Session #1**
+- publish your changes for all parallel sessions.
+
+**Session #2**
+- check that you can see a changes in session #2
+
+
+So, take a look on example of my output for Session #2.
+
+    pizza_db=> select * from pizzeria where name  = 'Pizza Hut';
+    id |   name    | rating
+    ----+-----------+--------
+    1 | Pizza Hut |    4.6
+    (1 row)
+
+    pizza_db=> select * from pizzeria where name  = 'Pizza Hut';
+    id |   name    | rating
+    ----+-----------+--------
+    1 | Pizza Hut |      5
+    (1 row)
+
+You can see the same query returns different results, because the first one was run before publishing in Session#1 and the second one was queried after finished Session#1. 
+
+
+
+## Chapter V
+## Exercise 01 - Lost Update Anomaly
+
+| Exercise 01: Lost Update Anomaly|                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex01                                                                                                                     |
+| Files to turn-in                      | `day08_ex01.sql` with comments for Session #1, Session #2 statements; screenshot of psql output for Session #1; screenshot of psql output for Session #2                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        |  SQL                                                                                              |
+
+Please for this task use the command line for PostgreSQL database (psql). You need to check how your changes will be published in the database for other database users. 
+
+Actually, we need two active sessions (meaning 2 parallel sessions in the command lines). 
+
+Before a task, make sure you are at a default isolation level in your database. Just run the next statement
+
+`SHOW TRANSACTION ISOLATION LEVEL;`
+
+and the result should be “read committed”;
+
+If not, then please set “read committed” isolation level explicitly on a session level.
+
+|  |  |
+| ------ | ------ |
+| Let’s check one of the famous “Lost Update Anomaly” database pattern. You can see a graphical presentation of that anomaly on a picture. Horizontal Red Line means the final results after all sequential steps for both Sessions. | ![D08_06](misc/images/D08_06.png) |
+
+Please check a rating for “Pizza Hut” in a transaction mode for both Sessions and after that make `UPDATE` of rating to 4 value in session #1 and make `UPDATE` of rating to 3.6 value in session #2 (in the same order as in the picture). 
+
+
+
+## Chapter VI
+## Exercise 02 - Lost Update for Repeatable Read
+
+| Exercise 02: Lost Update for Repeatable Read|                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex02                                                                                                                     |
+| Files to turn-in                      | `day08_ex02.sql` with comments for Session #1, Session #2 statements; screenshot of psql output for Session #1; screenshot of psql output for Session #2                                                                                  |
+| **Allowed**                               |                                                                                                                          |
+| Language                        |  SQL                                                                                              |
+
+Please for this task use the command line for PostgreSQL database (psql). You need to check how your changes will be published in the database for other database users. 
+
+Actually, we need two active sessions (meaning 2 parallel sessions in the command lines).
+
+|  |  |
+| ------ | ------ |
+| Let’s check one of the famous “Lost Update Anomaly” database pattern but under `REPEATABLE READ` isolation level. You can see a graphical presentation of that anomaly on a picture. Horizontal Red Line means the final results after all sequential steps for both Sessions. | ![D08_07](misc/images/D08_07.png) |
+
+Please check a rating for “Pizza Hut” in a transaction mode for both Sessions and after that make `UPDATE` of rating to 4 value in session #1 and make `UPDATE` of rating to 3.6 value in session #2 (in the same order as in the picture). 
+
+## Chapter VII
+## Exercise 03 - Non-Repeatable Reads Anomaly
+
+| Exercise 03: Non-Repeatable Reads Anomaly |                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex03                                                                                                                     |
+| Files to turn-in                      | `day08_ex03.sql` with comments for Session #1, Session #2 statements; screenshot of psql output for Session #1; screenshot of psql output for Session #2                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        |  SQL                                                                                              |
+
+Please for this task use the command line for PostgreSQL database (psql). You need to check how your changes will be published in the database for other database users. 
+
+Actually, we need two active sessions (meaning 2 parallel sessions in the command lines). 
+
+|  |  |
+| ------ | ------ |
+| Let’s check one of the famous “Non-Repeatable Reads” database pattern but under `READ COMMITTED` isolation level. You can see a graphical presentation of that anomaly on a picture. Horizontal Red Line means the final results after all sequential steps for both Sessions. | ![D08_08](misc/images/D08_08.png) |
+
+Please check a rating for “Pizza Hut” in a transaction mode for session #1 and after that make `UPDATE` of rating to 3.6 value in session #2 (in the same order as in the picture). 
+
+
+## Chapter VIII
+## Exercise 04 - Non-Repeatable Reads for Serialization
+
+
+| Exercise 04: Non-Repeatable Reads for Serialization |                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex04                                                                                                                     |
+| Files to turn-in                      | `day08_ex04.sql` with comments for Session #1, Session #2 statements; screenshot of psql output for Session #1; screenshot of psql output for Session #2                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        |  SQL                                                                                              |
+
+Please for this task use the command line for PostgreSQL database (psql). You need to check how your changes will be published in the database for other database users. 
+
+Actually, we need two active sessions (meaning 2 parallel sessions in the command lines).
+
+|  |  |
+| ------ | ------ |
+| Let’s check one of the famous “Non-Repeatable Reads” database pattern but under `SERIALIZABLE` isolation level. You can see a graphical presentation of that anomaly on a picture. Horizontal Red Line means the final results after all sequential steps for both Sessions. | ![D08_09](misc/images/D08_09.png) |
+
+Please check a rating for “Pizza Hut” in a transaction mode for session #1 and after that make `UPDATE` of rating to 3.0 value in session #2 (in the same order as in the picture). 
+
+
+
+## Chapter IX
+## Exercise 05 - Phantom Reads Anomaly
+
+
+| Exercise 05: Phantom Reads Anomaly|                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex05                                                                                                                     |
+| Files to turn-in                      | `day08_ex05.sql`  with comments for Session #1, Session #2 statements; screenshot of psql output for Session #1; screenshot of psql output for Session #2                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        |   SQL                                                                                              |
+
+Please for this task use the command line for PostgreSQL database (psql). You need to check how your changes will be published in the database for other database users. 
+
+Actually, we need two active sessions (meaning 2 parallel sessions in the command lines).
+
+|  |  |
+| ------ | ------ |
+| Let’s check one of the famous “Phantom Reads” database pattern but under `READ COMMITTED` isolation level. You can see a graphical presentation of that anomaly on a picture. Horizontal Red Line means the final results after all sequential steps for both Sessions. | ![D08_10](misc/images/D08_10.png) |
+
+Please summarize all ratings for all pizzerias in a transaction mode for session #1 and after that make `UPDATE` of rating to 1 value for “Pizza Hut” restaurant in session #2 (in the same order as in the picture). 
+
+ 
+
+## Chapter X
+## Exercise 06 - Phantom Reads for Repeatable Read
+
+
+| Exercise 06: Phantom Reads for Repeatable Read|                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex06                                                                                                                     |
+| Files to turn-in                      | `day08_ex06.sql`  with comments for Session #1, Session #2 statements; screenshot of psql output for Session #1; screenshot of psql output for Session #2                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        |  SQL                                                                                              |
+
+Please for this task use the command line for PostgreSQL database (psql). You need to check how your changes will be published in the database for other database users. 
+
+Actually, we need two active sessions (meaning 2 parallel sessions in the command lines).
+
+|  |  |
+| ------ | ------ |
+| Let’s check one of the famous “Phantom Reads” database pattern but under `REPEATABLE READ` isolation level. You can see a graphical presentation of that anomaly on a picture. Horizontal Red Line means the final results after all sequential steps for both Sessions. | ![D08_11](misc/images/D08_11.png) |
+
+
+Please summarize all ratings for all pizzerias in a transaction mode for session #1 and after that make `UPDATE` of rating to 5 value for “Pizza Hut” restaurant in session #2 (in the same order as in the picture). 
+
+## Chapter XI
+## Exercise 07 - Deadlock
+
+
+| Exercise 07: Deadlock|                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex07                                                                                                                     |
+| Files to turn-in                      | `day08_ex07.sql`    with comments for Session #1, Session #2 statements; screenshot of psql output for Session #1; screenshot of psql output for Session #2                                                                                |
+| **Allowed**                               |                                                                                                                          |
+| Language                        |  SQL                                                                                              |
+
+Please for this task use the command line for PostgreSQL database (psql). You need to check how your changes will be published in the database for other database users. 
+
+Actually, we need two active sessions (meaning 2 parallel sessions in the command lines). 
+
+Let’s reproduce a deadlock situation in our database. 
+
+
+|  |  |
+| ------ | ------ |
+| You can see a graphical presentation of the deadlock situation on a picture. Looks like a “christ-lock” between parallel sessions. | ![D08_12](misc/images/D08_12.png) |
+
+Please write any SQL statement with any isolation level (you can use default setting) on the `pizzeria` table to reproduce this deadlock situation.
+
+# Day 09 - Piscine SQL
+
+## _RDBMS is not just a tables_
+
+Resume: Today you will see how to create and use functional blocks in Databases
+
+## Contents
+
+1. [Chapter I](#chapter-i) \
+    1.1. [Preamble](#preamble)
+2. [Chapter II](#chapter-ii) \
+    2.1. [General Rules](#general-rules)
+3. [Chapter III](#chapter-iii) \
+    3.1. [Rules of the day](#rules-of-the-day)  
+4. [Chapter IV](#chapter-iv) \
+    4.1. [Exercise 00 - Audit of incoming inserts](#exercise-00-audit-of-incoming-inserts)  
+5. [Chapter V](#chapter-v) \
+    5.1. [Exercise 01 - Audit of incoming updates](#exercise-01-audit-of-incoming-updates)  
+6. [Chapter VI](#chapter-vi) \
+    6.1. [Exercise 02 - Audit of incoming deletes](#exercise-02-audit-of-incoming-deletes)  
+7. [Chapter VII](#chapter-vii) \
+    7.1. [Exercise 03 - Generic Audit](#exercise-03-generic-audit)  
+8. [Chapter VIII](#chapter-viii) \
+    8.1. [Exercise 04 - Database View VS Database Function](#exercise-04-database-view-vs-database-function)
+9. [Chapter IX](#chapter-ix) \
+    9.1. [Exercise 05 - Parameterized Database Function](#exercise-05-parameterized-database-function)
+10. [Chapter X](#chapter-x) \
+    10.1. [Exercise 06 - Function like a function-wrapper](#exercise-06-function-like-a-function-wrapper)
+11. [Chapter XI](#chapter-xi) \
+    11.1. [Exercise 07 - Different view to find a Minimum](#exercise-07-different-view-to-find-a-minimum)
+12. [Chapter XII](#chapter-xii) \
+    12.1. [Exercise 08 - Fibonacci algorithm is in a function](#exercise-08-fibonacci-algorithm-is-in-a-function)    
+      
+
+## Exercise 00 - Audit of incoming inserts
+
+| Exercise 00: Audit of incoming inserts |                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex00                                                                                                                     |
+| Files to turn-in                      | `day09_ex00.sql`                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        | SQL, DDL, DML|
+
+We want to be stronger with data and don’t want to lose any event of changes. Let’s implement an audit feature for INSERT’s incoming changes. 
+Please create a table `person_audit` with the same structure like a person table but please add a few additional changes. Take a look at the table below with descriptions for each column.
+
+| Column | Type | Description |
+| ------ | ------ | ------ |
+| created | timestamp with time zone | timestamp when a new event has been created.  Default value is a current timestamp and NOT NULL |
+| type_event | char(1) | possible values I (insert), D (delete), U (update). Default value is ‘I’. NOT NULL. Add check constraint `ch_type_event` with possible values ‘I’, ‘U’ and ‘D’ |
+| row_id |bigint | copy of person.id. NOT NULL |
+| name |varchar | copy of person.name (no any constraints) |
+| age |integer | copy of person.age (no any constraints) |
+| gender |varchar | copy of person.gender (no any constraints) |
+| address |varchar | copy of person.address (no any constraints) |
+
+Actually, let’s create a Database Trigger Function with the name `fnc_trg_person_insert_audit` that should process `INSERT` DML traffic and make a copy of a new row to the person_audit table.
+
+Just a hint, if you want to implement a PostgreSQL trigger (please read it in PostgreSQL documentation), you need to make 2 objects: Database Trigger Function and Database Trigger. 
+
+So, please define a Database Trigger with the name `trg_person_insert_audit` with the next options
+- trigger with “FOR EACH ROW” option
+- trigger with “AFTER INSERT”
+- trigger calls fnc_trg_person_insert_audit trigger function
+
+When you are ready with trigger objects then please make an `INSERT` statement into the person table. 
+`INSERT INTO person(id, name, age, gender, address) VALUES (10,'Damir', 22, 'male', 'Irkutsk');`
+
+
+## Chapter V
+## Exercise 01 - Audit of incoming updates
+
+| Exercise 01: Audit of incoming updates|                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex01                                                                                                                     |
+| Files to turn-in                      | `day09_ex01.sql`                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        | SQL, DDL, DML                                                                                              |
+
+Let’s continue to implement our audit pattern for the person table. Just define a trigger `trg_person_update_audit` and corresponding trigger function `fnc_trg_person_update_audit` to handle all `UPDATE` traffic on the person table. We should save OLD states of all attribute’s values.
+
+When you are ready please apply UPDATE’s statements below.
+
+`UPDATE person SET name = 'Bulat' WHERE id = 10;`
+`UPDATE person SET name = 'Damir' WHERE id = 10;`
+
+
+## Chapter VI
+## Exercise 02 - Audit of incoming deletes
+
+| Exercise 02: Audit of incoming deletes|                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex02                                                                                                                     |
+| Files to turn-in                      | `day09_ex02.sql`                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        | SQL, DDL, DML                                                                                              |
+
+Finally, we need to handle `DELETE` statements and make a copy of OLD states for all attribute’s values. Please create a trigger `trg_person_delete_audit` and corresponding trigger function `fnc_trg_person_delete_audit`. 
+
+When you are ready please apply the SQL statement below.
+
+`DELETE FROM person WHERE id = 10;`
+
+## Chapter VII
+## Exercise 03 - Generic Audit
+
+| Exercise 03: Generic Audit |                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex03                                                                                                                     |
+| Files to turn-in                      | `day09_ex03.sql`                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        | SQL, DDL, DML                                                                                              |
+
+Actually, there are 3 triggers for one `person` table. Let’s merge all our logic to the one main trigger with the name `trg_person_audit` and a new corresponding trigger function `fnc_trg_person_audit`.
+
+Other words, all DML traffic (`INSERT`, `UPDATE`, `DELETE`) should be handled from the one functional block. Please explicitly define a separated IF-ELSE block for every event (I, U, D)!
+
+Additionally, please take the steps below .
+- to drop 3 old triggers from the person table.
+- to drop 3 old trigger functions
+- to make a `TRUNCATE` (or `DELETE`) of all rows in our `person_audit` table
+
+When you are ready, please re-apply the set of DML statements.
+`INSERT INTO person(id, name, age, gender, address)  VALUES (10,'Damir', 22, 'male', 'Irkutsk');`
+`UPDATE person SET name = 'Bulat' WHERE id = 10;`
+`UPDATE person SET name = 'Damir' WHERE id = 10;`
+`DELETE FROM person WHERE id = 10;`
+
+
+## Chapter VIII
+## Exercise 04 - Database View VS Database Function
+
+
+| Exercise 04: Database View VS Database Function |                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex04                                                                                                                     |
+| Files to turn-in                      | `day09_ex04.sql`                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        | SQL, DDL, DML                                                                                              |
+
+As you remember, we created 2 database views to separate data from the person tables by gender attribute. 
+Please define 2 SQL-functions (please be aware, not pl/pgsql-functions) with names
+- `fnc_persons_female` (should return female persons)
+- `fnc_persons_male` (should return male persons)
+
+To check yourself and call a function, you can make a statement like below (amazing! you can work with a function like with a virtual table!). 
+
+    SELECT *
+    FROM fnc_persons_male();
+
+    SELECT *
+    FROM fnc_persons_female();
+
+
+## Chapter IX
+## Exercise 05 - Parameterized Database Function
+
+
+| Exercise 05: Parameterized Database Function|                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex05                                                                                                                     |
+| Files to turn-in                      | `day09_ex05.sql`                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        |  SQL, DDL, DML                                                                                               |
+
+Looks like 2 functions from exercise 04 need a more generic approach. Please before our further steps drop these functions from the database. 
+Write a common SQL-function (please be aware, not pl/pgsql-function) with the name `fnc_persons`. This function should have an `IN` parameter pgender with default value = ‘female’. 
+
+To check yourself and call a function, you can make a statement like below (wow! you can work with a function like with a virtual table but with more flexibilities!). 
+
+    select *
+    from fnc_persons(pgender := 'male');
+
+    select *
+    from fnc_persons();
+
+
+## Chapter X
+## Exercise 06 - Function like a function-wrapper
+
+
+| Exercise 06: Function like a function-wrapper|                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex06                                                                                                                     |
+| Files to turn-in                      | `day09_ex06.sql`                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        | SQL, DDL, DML                                                                                              |
+
+Let’s look at pl/pgsql functions right now. 
+
+Please create a pl/pgsql function  `fnc_person_visits_and_eats_on_date` based on SQL statement that finds the names of pizzerias which person (`IN` pperson parameter with default value is ‘Dmitriy’) visited and in which he could buy pizza for less than the given sum in rubles (`IN` pprice parameter with default value is 500) on the specific date (`IN` pdate parameter with default value is 8th of January 2022). 
+
+To check yourself and call a function, you can make a statement like below.
+
+    select *
+    from fnc_person_visits_and_eats_on_date(pprice := 800);
+
+    select *
+    from fnc_person_visits_and_eats_on_date(pperson := 'Anna',pprice := 1300,pdate := '2022-01-01');
+
+
+## Chapter XI
+## Exercise 07 - Different view to find a Minimum
+
+
+| Exercise 07: Different view to find a Minimum|                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex07                                                                                                                     |
+| Files to turn-in                      | `day09_ex07.sql`                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        | SQL, DDL, DML                                                                                              |
+
+Please write a SQL or pl/pgsql function `func_minimum` (it’s up to you) that has an input parameter is an array of numbers and the function should return a minimum value. 
+
+To check yourself and call a function, you can make a statement like below.
+
+    SELECT func_minimum(VARIADIC arr => ARRAY[10.0, -1.0, 5.0, 4.4]);
+
+
+## Chapter XII
+## Exercise 08 - Fibonacci algorithm is in a function
+
+
+| Exercise 08: Fibonacci algorithm is in a function|                                                                                                                          |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Turn-in directory                     | ex08                                                                                                                     |
+| Files to turn-in                      | `day09_ex08.sql`                                                                                 |
+| **Allowed**                               |                                                                                                                          |
+| Language                        | SQL, DDL, DML                                                                                              |
+
+Please write a SQL or pl/pgsql function `fnc_fibonacci` (it’s up to you) that has an input parameter pstop with type integer (by default is 10) and the function output is a table with all Fibonacci numbers less than pstop.
+
+To check yourself and call a function, you can make a statements like below.
+
+    select * from fnc_fibonacci(100);
+    select * from fnc_fibonacci();
